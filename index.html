@@ -80,6 +80,7 @@
         </div>
       </section>
 
+      <!-- 图片区域 -->
       <section>
         <h2 class="section-title">
          
@@ -346,6 +347,14 @@
       </div>
     </div>
 
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <img id="modalImage" src="" alt="Preview">
+      </div>
+    </div>
+
     <button id="backToTopBtn" class="back-to-top" title="返回顶部">
       <img src="image/向上2.svg" alt="返回顶部" />
     </button>
@@ -395,6 +404,34 @@
           modal.style.display = "none";
           modalVideo.pause();
           modalVideo.src = "";
+        }
+      });
+
+      // Image modal functionality
+      const imageModal = document.getElementById("imageModal");
+      const modalImage = document.getElementById("modalImage");
+      const imageCards = document.querySelectorAll(".img-card img");
+      const imageCloseBtn = imageModal.querySelector(".close");
+
+      imageCards.forEach((img) => {
+        img.addEventListener("click", () => {
+          const imgSrc = img.src;
+          const altText = img.alt;
+          modalImage.src = imgSrc;
+          modalImage.alt = altText;
+          imageModal.style.display = "flex";
+        });
+      });
+
+      imageCloseBtn.addEventListener("click", () => {
+        imageModal.style.display = "none";
+        modalImage.src = "";
+      });
+
+      window.addEventListener("click", (event) => {
+        if (event.target === imageModal) {
+          imageModal.style.display = "none";
+          modalImage.src = "";
         }
       });
 
