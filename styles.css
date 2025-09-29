@@ -321,22 +321,66 @@ section {
 }
 
 /* Image Card */
+/* Image Card Placeholder Style */
+/* Image Card with Prompt Text */
 .img-card {
-    flex: 1;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    border-radius: 1rem;
+    background: #f3f4f6;
+    border-radius: 1.5rem;
     padding: 1rem;
+    margin: 2rem auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    max-width: 1000px; /* 你可以调节和问卷一致 */
     transition: all 0.3s ease;
 }
 
 .img-card img {
-    width: 400%;
-    height: 400%;
-    object-fit: fill; /* 和 video 保持一致 */
+    width: 100%;
+    height: auto;
     border-radius: 0.75rem;
+    object-fit: contain;
+    margin-bottom: 0.5rem; /* 给文字留点空间 */
+}
+
+/* prompt-text 样式（沿用 video 的） */
+.img-card .prompt-text {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.img-card .prompt-text strong {
+    color: #1f2937;
+}
+
+/* Hover 效果 */
+.img-card:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    background: #ffffff;
+}
+
+/* Image Grid (single large image, same size as questionnaire) */
+.img-grid {
+    background: #f3f4f6;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    margin: 3rem auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.img-grid img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.img-grid img:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
