@@ -319,3 +319,24 @@ section {
     background-color: rgba(29, 53, 56, 0.8);
     object-fit: cover;
 }
+
+/* Image Card */
+.img-card {
+    flex: 1;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.img-card img {
+    width: 400%;
+    height: 400%;
+    object-fit: fill; /* 和 video 保持一致 */
+    border-radius: 0.75rem;
+}
