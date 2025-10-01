@@ -6,7 +6,7 @@
   <title>Animal Pair Matrix (9×9) — 36 Pairs</title>
   <!--
     How to use:
-    1) Put your pair images in ./pairs/
+    1) Put your pair images in ./pairs-illusionDiffusion/
     2) File naming convention: "{animal1}_{animal2}.png" using lowercase names from the list below.
        Example: duck_rabbit.png, mouse_elephant.png, cat_dog.png
     3) Only the upper triangle is filled (row < col). Diagonal and lower triangle are blank to avoid duplicates.
@@ -241,7 +241,7 @@
   <div class="page">
     <h1>Animal Pair Matrix (9×9)</h1>
     <div class="subtitle">Upper triangle shows the 36 unique pairs. Click any thumbnail to view a large image.</div>
-    <div class="legend">Image path convention: <code>./pairs/&lt;animal1&gt;_&lt;animal2&gt;.png</code> — lowercase, underscore between names. Example: <code>duck_rabbit.png</code>.</div>
+    <div class="legend">Image path convention: <code>./pairs-illusionDiffusion/&lt;animal1&gt;_&lt;animal2&gt;.png</code> — lowercase, underscore between names. Example: <code>duck_rabbit.png</code>.</div>
 
     <div class="matrix-wrap">
       <table class="matrix" id="matrix"></table>
@@ -301,7 +301,7 @@
         } else {
           const a1 = animals[i];
           const a2 = animals[j];
-          const file = `pairs/${a1}_${a2}.png`;
+          const file = `pairs-illusionDiffusion/${a1}_${a2}.png`;
           const label = `${cap(a1)}–${cap(a2)}`;
 
           const wrap = document.createElement('div');
