@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animal Pair Matrix (9×9) — 36 Pairs</title>
+  <!--
+    How to use:
+    1) Put your pair images in ./pairs/
+    2) File naming convention: "{animal1}_{animal2}.png" using lowercase names from the list below.
+       Example: duck_rabbit.png, mouse_elephant.png, cat_dog.png
+    3) Only the upper triangle is filled (row < col). Diagonal and lower triangle are blank to avoid duplicates.
+    4) If an image is missing, the cell shows a text badge (still clickable for a large modal fallback).
+
+    Animal list (order matters for the matrix axes):
+    ["mouse", "frog", "bird", "cat", "rabbit", "duck", "dog", "horse", "elephant"]
+  -->
+  <style>
+    :root {
+      --cell: 96px;           /* thumbnail size */
+      --gap: 6px;
+      --radius: 12px;
+      --shadow: 0 6px 18px rgba(0,0,0,0.15);
+      --border: #e5e7eb;
+      --header-bg: #f8fafc;
+      --accent: #111827;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 24px auto 80px;
+      padding: 0 16px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 16px;
+    }
+
+    .matrix-wrap {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table.matrix {
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: calc(10 * var(--cell));
+    }
+
+    .matrix th,
+    .matrix td {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 6px;
+      text-align: center;
+      position: relative;
+      width: var(--cell);
+      height: var(--cell);
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .matrix tr:first-child th {
+      border-top: none;
+    }
+
+    .matrix th:first-child,
+    .matrix td:first-child {
+      border-left: none;
+    }
+
+    /* Sticky headers for better navigation */
+    .matrix thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--header-bg);
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .row-header {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--header-bg);
+      font-weight: 700;
+      color: #0f172a;
+      text-align: left !important;
+      padding-left: 10px !important;
+    }
+
+    /* Empty / disabled cells (diagonal and lower triangle) */
+    .empty {
+      background: #fafafa;
+    }
+
+    /* Thumbnail card */
+    .thumb {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .thumb img {
+      width: calc(var(--cell) - 12px);
+      height: calc(var(--cell) - 12px);
+      object-fit: cover;
+      border-radius: var(--radius);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+      will-change: transform;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .thumb:hover img {
+      transform: scale(1.12);
+      box-shadow: var(--shadow);
+      z-index: 1;
+    }
+
+    /* Fallback badge when image not found */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #eef2ff;
+      color: #3730a3;
+      border: 1px solid #e0e7ff;
+      white-space: nowrap;
+    }
+
+    /* Tooltip for pair name */
+    .thumb[data-title]:hover::after {
+      content: attr(data-title);
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translate(-50%, 100%);
+      background: rgba(17,24,39,0.9);
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Modal (lightbox) */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.6);
+      z-index: 50;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      max-width: min(90vw, 960px);
+      max-height: 90vh;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .close-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .modal-body {
+      display: grid;
+      place-items: center;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+      max-height: 72vh;
+      border-radius: 12px;
+    }
+
+    /* Legend */
+    .legend {
+      font-size: 13px;
+      color: #475569;
+      margin: 8px 0 16px;
+    }
+
+    .legend code { background: #f8fafc; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Animal Pair Matrix (9×9)</h1>
+    <div class="subtitle">Upper triangle shows the 36 unique pairs. Click any thumbnail to view a large image.</div>
+    <div class="legend">Image path convention: <code>./pairs/&lt;animal1&gt;_&lt;animal2&gt;.png</code> — lowercase, underscore between names. Example: <code>duck_rabbit.png</code>.</div>
+
+    <div class="matrix-wrap">
+      <table class="matrix" id="matrix"></table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Large image preview">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="title" id="modalTitle">Pair</h2>
+        <button class="close-btn" id="closeBtn" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImg" alt="Pair image" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const animals = [
+      "mouse", "frog", "bird", "cat", "rabbit", "duck", "dog", "horse", "elephant"
+    ];
+
+    const table = document.getElementById('matrix');
+
+    function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    // Build header row
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    const corner = document.createElement('th');
+    headRow.appendChild(corner);
+    animals.forEach(a => {
+      const th = document.createElement('th');
+      th.textContent = cap(a);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+
+    const tbody = document.createElement('tbody');
+
+    for (let i = 0; i < animals.length; i++) {
+      const tr = document.createElement('tr');
+
+      // Row header
+      const th = document.createElement('th');
+      th.className = 'row-header';
+      th.textContent = cap(animals[i]);
+      tr.appendChild(th);
+
+      for (let j = 0; j < animals.length; j++) {
+        const td = document.createElement('td');
+
+        if (i >= j) {
+          td.className = 'empty'; // diagonal and lower triangle
+        } else {
+          const a1 = animals[i];
+          const a2 = animals[j];
+          const file = `pairs/${a1}_${a2}.png`;
+          const label = `${cap(a1)}–${cap(a2)}`;
+
+          const wrap = document.createElement('div');
+          wrap.className = 'thumb';
+          wrap.dataset.title = label;
+          wrap.tabIndex = 0; // keyboard focusable
+
+          const img = document.createElement('img');
+          img.alt = label;
+          img.loading = 'lazy';
+          img.decoding = 'async';
+
+          // fallback if image not found -> show a text badge
+          img.addEventListener('error', () => {
+            wrap.innerHTML = '';
+            const b = document.createElement('span');
+            b.className = 'badge';
+            b.textContent = label;
+            wrap.appendChild(b);
+          }, { once: true });
+
+          img.src = file;
+          wrap.appendChild(img);
+
+          // open modal on click/enter/space
+          const open = () => openModal(label, file);
+          wrap.addEventListener('click', open);
+          wrap.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+          });
+
+          td.appendChild(wrap);
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    // Modal logic
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const closeBtn = document.getElementById('closeBtn');
+
+    function openModal(title, src){
+      modalTitle.textContent = title;
+      modalImg.src = src;
+      modal.classList.add('open');
+    }
+
+    function closeModal(){
+      modal.classList.remove('open');
+      modalImg.removeAttribute('src');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+  </script>
+</body>
+</html>
